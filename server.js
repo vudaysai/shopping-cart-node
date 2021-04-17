@@ -13,6 +13,9 @@ mongoose
     const AuthController = require('./controllers/auth');
     app.use('/api/auth', AuthController);
 
+    const UserController = require('./controllers/users');
+    app.use('/api/users', UserController);
+
     app.listen(process.env.PORT, () => {
       console.log("Server has started!")
     })
