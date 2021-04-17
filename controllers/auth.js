@@ -8,7 +8,7 @@ const User = require('../models/user');
 
 const SECRET = process.env.JWT_SECRET;
 
-router.post('/register', function (req, res) {
+router.post('/register', async function (req, res) {
   try {
     const { name, email, password } = req.body;
 
@@ -18,10 +18,10 @@ router.post('/register', function (req, res) {
     const hashedPassword = bcrypt.hashSync(password, 8);
     const userBody = { name, email, password: hashedPassword };
 
-    User.create(userBody);
+    await User.create(userBody);
     return res.status(201).json({ success: true, message: 'Registered' })
   } catch (error) {
-    res.status(500).json({ message: error.message || 'Unprocessable Entity' })
+    res.status(500).json({ success: false, message: error.message || 'Unprocessable Entity' })
   }
 });
 
@@ -39,7 +39,7 @@ router.post('/login', async function (req, res) {
       expiresIn: 86400 // expires in 24 hours
     });
 
-    return res.status(200).json({ success: true, token });
+    return res.status(200).json({ success: true, token, isAdmin: user.isAdmin });
   } catch (error) {
     return res.status(500).josn({ message: error.message || 'Error on the server.' });
   }

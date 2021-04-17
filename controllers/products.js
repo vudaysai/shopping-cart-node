@@ -2,6 +2,11 @@ const express = require("express");
 const router = express.Router();
 const Product = require("../models/product");
 
+const checkIfAdmin = (req, res, next) => {
+  const { isAdmin } = req.body;
+  if (!isAdmin) return res.status(401).json({ message: 'unauthorized' });
+  return next()
+}
 // Get all products
 router.get("/", async (req, res) => {
   try {
@@ -13,10 +18,10 @@ router.get("/", async (req, res) => {
 });
 
 // Create one product
-router.post("/", async (req, res) => {
-  const { name, imageURl, price } = req.body;
+router.post("/", checkIfAdmin, async (req, res) => {
+  const { name, imageURL, price, } = req.body;
   const product = new Product({
-    name, imageURl, price
+    name, imageURL, price
   });
 
   try {
@@ -33,10 +38,10 @@ router.get("/:id", getProduct, (req, res) => {
 });
 
 // Update one Product
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", checkIfAdmin, async (req, res) => {
   try {
-    const { name, imageURl, price } = req.body;
-    const updatedProduct = await Product.findOneAndUpdate({ _id: req.params.id }, { name, imageURl, price }, { new: true });
+    const { name, imageURL, price } = req.body;
+    const updatedProduct = await Product.findOneAndUpdate({ _id: req.params.id }, { name, imageURL, price }, { new: true });
     res.json(updatedProduct);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -44,7 +49,7 @@ router.patch("/:id", async (req, res) => {
 });
 
 // Delete one product
-router.delete("/:id", getProduct, async (req, res) => {
+router.delete("/:id", checkIfAdmin, getProduct, async (req, res) => {
   try {
     await res.product.remove();
     res.json({ message: "Deleted product" });

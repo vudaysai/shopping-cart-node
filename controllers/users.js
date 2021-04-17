@@ -3,7 +3,13 @@ const router = express.Router();
 
 const User = require('../models/user');
 
-router.get('/', async function (req, res) {
+const checkIfAdmin = (req, res, next) => {
+  const { isAdmin } = req.body;
+  if (!isAdmin) return res.status(401).json({ message: 'unauthorized' });
+  return next()
+}
+
+router.get('/', checkIfAdmin, async function (req, res) {
   try {
     const users = await User.find({ isAdmin: false }).select(['-password', '-isAdmin']).lean();
     return res.status(200).json({ success: true, users })
@@ -12,7 +18,7 @@ router.get('/', async function (req, res) {
   }
 });
 
-router.get('/:id', async function (req, res) {
+router.get('/:id', checkIfAdmin, async function (req, res) {
   try {
     const { id } = req.params;
 
