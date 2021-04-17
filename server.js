@@ -25,7 +25,8 @@ mongoose
     app.use('/api/transactions', authMiddleware, TransactionController);
 
     app.listen(process.env.PORT, () => {
-      console.log("Server has started!")
+      const seeder = require('./seeder');
+      seeder.initialSeed()
     })
 
   })
